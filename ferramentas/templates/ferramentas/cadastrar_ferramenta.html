@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Ferramenta</title>
+</head>
+<body>
+
+<h1>Cadastrar Ferramenta</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <input name="nome" placeholder="Nome" required><br><br>
+    <input name="categoria" placeholder="Categoria"><br><br>
+    <textarea name="descricao" placeholder="Descrição"></textarea><br><br>
+
+    <input name="valor_diaria" placeholder="Valor diária" type="number" step="0.01"><br><br>
+    <input name="valor_semanal" placeholder="Valor semanal" type="number" step="0.01"><br><br>
+    <input name="valor_mensal" placeholder="Valor mensal" type="number" step="0.01"><br><br>
+
+    <input name="quantidade_total" placeholder="Quantidade" type="number"><br><br>
+
+    <button type="submit">Salvar</button>
+</form>
+
+<a href="{% url 'home' %}">Voltar</a>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Locação</title>
+</head>
+<body>
+
+<h1>Nova Locação</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Cliente:</label><br>
+    <select name="cliente" required>
+        {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Ferramenta:</label><br>
+    <select name="ferramenta" required>
+        {% for ferramenta in ferramentas %}
+            <option value="{{ ferramenta.id }}">
+                {{ ferramenta.nome }} ({{ ferramenta.quantidade_disponivel }} disponível)
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Data início:</label><br>
+    <input type="date" name="data_inicio" required><br><br>
+
+    <label>Data fim:</label><br>
+    <input type="date" name="data_fim" required><br><br>
+
+    <button type="submit">Salvar Locação</button>
+</form>
+
+<br>
+<a href="{% url 'home' %}">Voltar</a>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Locadora de Ferramentas</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
+</head>
+<body>
+
+<h1>Sistema em Desenvolvimento</h1>
+
+<a href="{% url 'cadastrar_cliente' %}">
+    <button>Novo Cliente</button>
+</a>
+
+<a href="{% url 'cadastrar_ferramenta' %}">
+    <button>Nova Ferramenta</button>
+</a>
+
+<a href="{% url 'nova_locacao' %}">
+    <button>Nova Locação</button>
+</a>
+
+<h2>Locações</h2>
+
+<table>
+    <tr>
+        <th>Cliente</th>
+        <th>Ferramenta</th>
+        <th>Início</th>
+        <th>Fim</th>
+        <th>Valor</th>
+        <th>Status</th>
+    </tr>
+
+    {% for locacao in locacoes %}
+    <tr>
+        <td>{{ locacao.cliente.nome }}</td>
+        <td>{{ locacao.ferramenta.nome }}</td>
+        <td>{{ locacao.data_inicio }}</td>
+        <td>{{ locacao.data_fim }}</td>
+        <td>R$ {{ locacao.valor_total }}</td>
+        <td>
+            {% if locacao.devolvida %}
+                Devolvida
+            {% else %}
+                Ativa
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

@@ -1,21 +1,20 @@
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from datetime import date
-from decimal import Decimal 
-from django.core.exceptions import ValidationError
-
 
 
 class Ferramenta(models.Model):
     nome = models.CharField(max_length=200)
     descricao = models.TextField(blank=True)
     categoria = models.CharField(max_length=100)
+
     valor_diaria = models.DecimalField(max_digits=8, decimal_places=2)
     valor_semanal = models.DecimalField(max_digits=8, decimal_places=2)
     valor_mensal = models.DecimalField(max_digits=8, decimal_places=2)
+
     quantidade_total = models.PositiveIntegerField(default=1)
     quantidade_disponivel = models.PositiveIntegerField(default=1)
+
     ativa = models.BooleanField(default=True)
 
     def __str__(self):
@@ -32,8 +31,8 @@ class Cliente(models.Model):
 
     def __str__(self):
         return self.nome
-    
-    
+
+
 class Locacao(models.Model):
     cliente = models.ForeignKey(
         Cliente,
@@ -53,44 +52,56 @@ class Locacao(models.Model):
     valor_total = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        editable=False  
+        blank=True,
+        null=True
     )
 
     devolvida = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)
-def save(self, *args, **kwargs):
-    criando = self.pk is None
 
-    dias = (self.data_fim - self.data_inicio).days
-    if dias <= 0:
-        dias = 1
+    def clean(self):
+        if self.data_fim < self.data_inicio:
+            raise ValidationError("A data final não pode ser menor que a inicial.")
 
-    mudou_mes = (
-        self.data_inicio.year != self.data_fim.year or
-        self.data_inicio.month != self.data_fim.month
-    )
+    def save(self, *args, **kwargs):
+        self.clean()
 
-    if dias <= 7:
-        self.valor_total = dias * self.ferramenta.valor_diaria
-    elif mudou_mes:
-        self.valor_total = self.ferramenta.valor_mensal
-    else:
-        self.valor_total = dias * self.ferramenta.valor_diaria
+        dias = (self.data_fim - self.data_inicio).days
+        if dias <= 0:
+            dias = 1
 
-    if criando:
-        if self.ferramenta.quantidade_disponivel <= 0:
-            raise ValidationError("Ferramenta sem estoque disponível")
+        # cálculo do valor
+        if dias <= 7:
+            self.valor_total = dias * self.ferramenta.valor_diaria
+        elif dias <= 30:
+            self.valor_total = self.ferramenta.valor_mensal
+        else:
+            meses = max(1, dias // 30)
+            self.valor_total = meses * self.ferramenta.valor_mensal
 
-        self.ferramenta.quantidade_disponivel -= 1
-        self.ferramenta.save()
+        criando = self.pk is None
 
-    if not criando and self.devolvida:
-        locacao_antiga = Locacao.objects.get(pk=self.pk)
-        if not locacao_antiga.devolvida:
-            self.ferramenta.quantidade_disponivel += 1
+        # controle de estoque
+        if criando:
+            if self.ferramenta.quantidade_disponivel <= 0:
+                raise ValidationError("Ferramenta sem estoque disponível.")
+
+            self.ferramenta.quantidade_disponivel -= 1
             self.ferramenta.save()
+        else:
+            locacao_antiga = Locacao.objects.get(pk=self.pk)
+            if not locacao_antiga.devolvida and self.devolvida:
+                self.ferramenta.quantidade_disponivel += 1
+                self.ferramenta.save()
 
-    super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.cliente} - {self.ferramenta}"
+
+
+
+
 
 
 

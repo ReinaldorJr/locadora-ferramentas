@@ -1,0 +1,17 @@
+<h1>{{ titulo }}</h1>
+
+<table border="1">
+<tr>
+    <th>Cliente</th>
+    <th>Ferramenta</th>
+</tr>
+
+{% for l in locacoes %}
+<tr>
+    <td>{{ l.cliente.nome }}</td>
+    <td>{{ l.ferramenta.nome }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<a href="{% url 'home' %}">Voltar</a>

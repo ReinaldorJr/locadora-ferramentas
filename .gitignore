@@ -1,16 +1,13 @@
-# Ambiente virtual
-venv/
-.env
-
-# Django
+# Python
 __pycache__/
 *.pyc
+
+# Virtualenv
+venv/
+
+# Django
 db.sqlite3
+.env
 
-# IDEs
+# VSCode
 .vscode/
-.idea/
-
-# Sistema
-*.log
-
