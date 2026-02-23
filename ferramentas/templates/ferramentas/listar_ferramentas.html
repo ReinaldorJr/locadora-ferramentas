@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Estoque - Ferramentas</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
+
+    <style>
+        .badge { padding: 3px 8px; border-radius: 999px; font-size: 12px; border: 1px solid #ddd; }
+        .badge.ok { background: #e9f7ef; border-color: #b7e1c2; }
+        .badge.warn { background: #fff3cd; border-color: #ffe8a1; }
+        .badge.danger { background: #ffeceb; border-color: #f5b7b1; }
+        .muted { color: #777; font-size: 12px; }
+        .row-actions { display:flex; gap:8px; }
+        .searchbar { display:flex; gap:10px; align-items:center; margin: 12px 0; }
+        .searchbar input { padding: 8px 10px; border: 1px solid #bbb; border-radius: 8px; width: 340px; }
+    </style>
+</head>
+<body>
+
+<h1>Estoque - Ferramentas</h1>
+
+<div class="top-actions">
+    <a class="btn" href="{% url 'home' %}">Voltar</a>
+    <a class="btn" href="{% url 'cadastrar_ferramenta' %}">Nova Ferramenta</a>
+</div>
+
+<form class="searchbar" method="get">
+    <input type="text" name="q" placeholder="Buscar por nome, categoria ou descrição..." value="{{ q }}">
+    <button class="btn" type="submit">Buscar</button>
+    {% if q %}
+        <a class="btn" href="{% url 'listar_ferramentas' %}">Limpar</a>
+    {% endif %}
+</form>
+
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Disponível</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for f in ferramentas %}
+        <tr>
+            <td>
+                <b>{{ f.nome }}</b>
+                {% if f.descricao %}
+                    <div class="muted">{{ f.descricao|truncatechars:80 }}</div>
+                {% endif %}
+            </td>
+            <td>{{ f.categoria }}</td>
+            <td>{{ f.quantidade_disponivel }}</td>
+            <td>{{ f.quantidade_total }}</td>
+            <td>
+                {% if not f.ativa %}
+                    <span class="badge danger">Desativada</span>
+                {% else %}
+                    {% if f.quantidade_disponivel <= 0 %}
+                        <span class="badge danger">Sem estoque</span>
+                    {% elif f.quantidade_disponivel <= 2 %}
+                        <span class="badge warn">Estoque baixo</span>
+                    {% else %}
+                        <span class="badge ok">OK</span>
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                <div class="row-actions">
+                    <a class="btn" href="{% url 'editar_ferramenta' f.id %}">Editar</a>
+                    <form method="post" action="{% url 'toggle_ferramenta' f.id %}">
+                        {% csrf_token %}
+                        {% if f.ativa %}
+                            <button class="btn danger" type="submit">Desativar</button>
+                        {% else %}
+                            <button class="btn" type="submit">Ativar</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="6">Nenhuma ferramenta cadastrada.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+</body>
+</html>

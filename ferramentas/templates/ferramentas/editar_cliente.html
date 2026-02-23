@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Cliente</title>
+    <title>Editar Cliente</title>
 
     {% load static %}
     <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
@@ -15,12 +15,12 @@
         input, textarea { padding: 10px; border:1px solid #bbb; border-radius: 8px; font-size: 14px; width:100%; }
         textarea { min-height: 90px; }
         .actions { display:flex; gap:10px; align-items:center; margin-top: 8px; }
-        .hint { font-size: 12px; color:#666; margin-top: 6px; }
+        .note { font-size: 12px; color:#666; margin-top: 8px; }
     </style>
 </head>
 <body>
 
-<h1>Cadastrar Cliente</h1>
+<h1>Editar Cliente</h1>
 
 <div class="top-actions">
     <a class="btn" href="{% url 'listar_clientes' %}">Voltar</a>
@@ -31,31 +31,40 @@
         {% csrf_token %}
 
         <div class="row">
-            <label for="nome">Nome / Razão social</label>
-            <input id="nome" type="text" name="nome" placeholder="Ex: Construtora Camila" required>
+            <label>Nome</label>
+            <input type="text" name="nome" value="{{ cliente.nome }}" required>
         </div>
 
         <div class="grid">
             <div class="row">
-                <label for="cpf_cnpj">CPF/CNPJ</label>
-                <input id="cpf_cnpj" type="text" name="cpf_cnpj" placeholder="Digite CPF ou CNPJ" required>
+                <label>CPF/CNPJ</label>
+                <input type="text" name="cpf_cnpj" value="{{ cliente.cpf_cnpj }}" required>
             </div>
 
             <div class="row">
-                <label for="telefone">Telefone</label>
-                <input id="telefone" type="text" name="telefone" placeholder="Ex: (11) 99999-9999" required>
+                <label>Telefone</label>
+                <input type="text" name="telefone" value="{{ cliente.telefone }}" required>
             </div>
         </div>
 
         <div class="row">
-            <label for="email">E-mail (opcional)</label>
-            <input id="email" type="email" name="email" placeholder="Ex: financeiro@empresa.com.br">
+            <label>E-mail</label>
+            <input type="email" name="email" value="{{ cliente.email }}">
         </div>
 
         <div class="row">
-            <label for="endereco">Endereço (opcional)</label>
-            <textarea id="endereco" name="endereco" placeholder="Rua, número, bairro, cidade, etc."></textarea>
-            <div class="hint">Você pode deixar em branco e preencher depois.</div>
+            <label>Endereço</label>
+            <textarea name="endereco">{{ cliente.endereco }}</textarea>
+        </div>
+
+        <div class="row">
+            <label>
+                <input type="checkbox" name="ativo" {% if cliente.ativo %}checked{% endif %}>
+                Cliente ativo
+            </label>
+            <div class="note">
+                Se desativar, ele não aparece para nova locação.
+            </div>
         </div>
 
         <div class="actions">

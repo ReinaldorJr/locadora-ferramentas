@@ -29,15 +29,15 @@
             </tr>
         </thead>
         <tbody>
-        {% for locacao in atrasadas %}
+        {% for item in dados %}
             <tr>
-                <td>{{ locacao.cliente.nome }}</td>
-                <td>{{ locacao.cliente.telefone }}</td>
-                <td>{{ locacao.ferramenta.nome }}</td>
-                <td>{{ locacao.data_fim|date:"d/m/Y" }}</td>
-                <td>{{ hoje|timeuntil:locacao.data_fim }}</td>
+                <td>{{ item.locacao.cliente.nome }}</td>
+                <td>{{ item.locacao.cliente.telefone }}</td>
+                <td>{{ item.locacao.ferramenta.nome }}</td>
+                <td>{{ item.locacao.data_fim|date:"d/m/Y" }}</td>
+                <td><b>{{ item.dias_atraso }}</b></td>
                 <td>
-                    <form method="post" action="{% url 'devolver_locacao' locacao.id %}">
+                    <form method="post" action="{% url 'devolver_locacao' item.locacao.id %}">
                         {% csrf_token %}
                         <button class="btn danger" type="submit">Devolver</button>
                     </form>
