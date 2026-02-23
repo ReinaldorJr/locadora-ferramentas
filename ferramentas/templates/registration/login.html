@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Locadora de Ferramentas</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
+
+    <style>
+        .login-wrap {
+            max-width: 420px;
+            margin: 60px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .login-wrap h1 { margin: 0 0 12px 0; font-size: 20px; }
+        .login-row { display: grid; gap: 6px; margin-bottom: 12px; }
+        .login-row label { font-size: 13px; color: #444; }
+        .login-row input {
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .login-actions { display: flex; gap: 10px; align-items: center; }
+        .btn.primary {
+            border-color: #2c3e50;
+            background: #2c3e50;
+            color: #fff;
+        }
+        .btn.primary:hover { background: #233140; }
+        .help { font-size: 12px; color: #666; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="login-wrap">
+    <h1>Entrar</h1>
+
+    {% if form.errors %}
+        <div class="messages">
+            <div class="alert alert-error">
+                Usuário ou senha inválidos. Tente novamente.
+            </div>
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <div class="login-row">
+            <label for="id_username">Usuário</label>
+            <input type="text" name="username" autofocus autocapitalize="none"
+                   autocomplete="username" maxlength="150" required id="id_username">
+        </div>
+
+        <div class="login-row">
+            <label for="id_password">Senha</label>
+            <input type="password" name="password" autocomplete="current-password"
+                   required id="id_password">
+        </div>
+
+        <input type="hidden" name="next" value="{{ next|default:'/' }}">
+
+        <div class="login-actions">
+            <button class="btn primary" type="submit">Entrar</button>
+            <a class="btn" href="/admin/">Admin</a>
+        </div>
+
+        <div class="help">
+            Use seu usuário e senha para acessar o sistema.
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Atrasos</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
+</head>
+<body>
+
+<h1>Relatório de Atrasos</h1>
+<p>Data de hoje: <b>{{ hoje|date:"d/m/Y" }}</b></p>
+
+<div class="top-actions">
+    <a class="btn" href="{% url 'home' %}">Voltar</a>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Telefone</th>
+                <th>Ferramenta</th>
+                <th>Fim previsto</th>
+                <th>Dias em atraso</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for locacao in atrasadas %}
+            <tr>
+                <td>{{ locacao.cliente.nome }}</td>
+                <td>{{ locacao.cliente.telefone }}</td>
+                <td>{{ locacao.ferramenta.nome }}</td>
+                <td>{{ locacao.data_fim|date:"d/m/Y" }}</td>
+                <td>{{ hoje|timeuntil:locacao.data_fim }}</td>
+                <td>
+                    <form method="post" action="{% url 'devolver_locacao' locacao.id %}">
+                        {% csrf_token %}
+                        <button class="btn danger" type="submit">Devolver</button>
+                    </form>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6">Nenhuma locação atrasada 🎉</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

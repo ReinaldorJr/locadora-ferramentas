@@ -1,3 +1,4 @@
+<!-- templates/ferramentas/home.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -11,47 +12,101 @@
 
 <h1>Sistema em Desenvolvimento</h1>
 
-<a href="{% url 'cadastrar_cliente' %}">
-    <button>Novo Cliente</button>
-</a>
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
-<a href="{% url 'cadastrar_ferramenta' %}">
-    <button>Nova Ferramenta</button>
-</a>
+<div class="top-actions">
+    {% if is_admin %}
+        <a class="btn" href="{% url 'cadastrar_cliente' %}">Novo Cliente</a>
+        <a class="btn" href="{% url 'cadastrar_ferramenta' %}">Nova Ferramenta</a>
+    {% endif %}
 
-<a href="{% url 'nova_locacao' %}">
-    <button>Nova Locação</button>
-</a>
+    <a class="btn" href="{% url 'nova_locacao' %}">Nova Locação</a>
+
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button class="btn danger" type="submit">Sair</button>
+    </form>
+</div>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-title">Locações ativas</div>
+        <div class="card-value">{{ total_ativas }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Locações devolvidas</div>
+        <div class="card-value">{{ total_devolvidas }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Ferramentas disponíveis</div>
+        <div class="card-value">{{ ferramentas_disponiveis }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Faturamento (devolvidas)</div>
+        <div class="card-value">R$ {{ faturamento|floatformat:2 }}</div>
+    </div>
+</div>
 
 <h2>Locações</h2>
 
+<div class="table-wrap">
 <table>
-    <tr>
-        <th>Cliente</th>
-        <th>Ferramenta</th>
-        <th>Início</th>
-        <th>Fim</th>
-        <th>Valor</th>
-        <th>Status</th>
-    </tr>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Ferramenta</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
 
+    <tbody>
     {% for locacao in locacoes %}
-    <tr>
-        <td>{{ locacao.cliente.nome }}</td>
-        <td>{{ locacao.ferramenta.nome }}</td>
-        <td>{{ locacao.data_inicio }}</td>
-        <td>{{ locacao.data_fim }}</td>
-        <td>R$ {{ locacao.valor_total }}</td>
-        <td>
-            {% if locacao.devolvida %}
-                Devolvida
-            {% else %}
-                Ativa
-            {% endif %}
-        </td>
-    </tr>
+        <tr>
+            <td>{{ locacao.cliente.nome }}</td>
+            <td>{{ locacao.ferramenta.nome }}</td>
+            <td>{{ locacao.data_inicio|date:"d/m/Y" }}</td>
+            <td>{{ locacao.data_fim|date:"d/m/Y" }}</td>
+            <td>R$ {{ locacao.valor_total|floatformat:2 }}</td>
+
+            <td>
+                {% if locacao.devolvida %}
+                    <span class="status status-ok">Devolvida</span>
+                {% else %}
+                    <span class="status status-warn">Ativa</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if locacao.devolvida %}
+                    —
+                {% else %}
+                    <form method="post" action="{% url 'devolver_locacao' locacao.id %}">
+                        {% csrf_token %}
+                        <button class="btn danger" type="submit">Devolver</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="7">Nenhuma locação cadastrada.</td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
+</div>
 
 </body>
 </html>

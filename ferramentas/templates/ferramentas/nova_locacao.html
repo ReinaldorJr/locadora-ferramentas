@@ -1,43 +1,106 @@
+<!-- templates/ferramentas/nova_locacao.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Nova Locação</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
+
+    <style>
+        .form-wrap {
+            max-width: 760px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+        label { font-size: 13px; color: #444; }
+        select, input {
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        @media (max-width: 720px) {
+            .row { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
 <h1>Nova Locação</h1>
 
-<form method="post">
-    {% csrf_token %}
-
-    <label>Cliente:</label><br>
-    <select name="cliente" required>
-        {% for cliente in clientes %}
-            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
         {% endfor %}
-    </select><br><br>
+    </div>
+{% endif %}
 
-    <label>Ferramenta:</label><br>
-    <select name="ferramenta" required>
-        {% for ferramenta in ferramentas %}
-            <option value="{{ ferramenta.id }}">
-                {{ ferramenta.nome }} ({{ ferramenta.quantidade_disponivel }} disponível)
-            </option>
-        {% endfor %}
-    </select><br><br>
+<div class="form-wrap">
+    <form method="post">
+        {% csrf_token %}
 
-    <label>Data início:</label><br>
-    <input type="date" name="data_inicio" required><br><br>
+        <div class="row">
+            <div class="field">
+                <label for="cliente">Cliente</label>
+                <select id="cliente" name="cliente" required>
+                    <option value="">-- selecione --</option>
+                    {% for c in clientes %}
+                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    <label>Data fim:</label><br>
-    <input type="date" name="data_fim" required><br><br>
+            <div class="field">
+                <label for="ferramenta">Ferramenta</label>
+                <select id="ferramenta" name="ferramenta" required>
+                    <option value="">-- selecione --</option>
+                    {% for f in ferramentas %}
+                        <option value="{{ f.id }}">{{ f.nome }} (disp.: {{ f.quantidade_disponivel }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
-    <button type="submit">Salvar Locação</button>
-</form>
+        <div class="row">
+            <div class="field">
+                <label for="data_inicio">Data de início</label>
+                <!-- NOME CORRETO: data_inicio -->
+                <input id="data_inicio" name="data_inicio" type="date" required>
+            </div>
 
-<br>
-<a href="{% url 'home' %}">Voltar</a>
+            <div class="field">
+                <label for="data_fim">Data de fim</label>
+                <!-- NOME CORRETO: data_fim -->
+                <input id="data_fim" name="data_fim" type="date" required>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Salvar</button>
+            <a class="btn" href="{% url 'home' %}">Voltar</a>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>
