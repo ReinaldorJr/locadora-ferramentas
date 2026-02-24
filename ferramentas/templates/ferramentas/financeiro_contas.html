@@ -1,0 +1,66 @@
+{% extends "ferramentas/base.html" %}
+{% block title %}Financeiro - Contas a Receber{% endblock %}
+
+{% block content %}
+
+<h2>Financeiro - Contas a Receber</h2>
+
+<div class="table-wrap" style="padding: 12px;">
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:2; min-width:240px;">
+            <label>Buscar</label><br>
+            <input type="text" name="q" value="{{ q }}" style="width:100%; padding:8px;"
+                   placeholder="Cliente, CPF/CNPJ ou ferramenta">
+        </div>
+
+        <div style="flex:1; min-width:200px;">
+            <label>Status</label><br>
+            <select name="status" style="width:100%; padding:8px;">
+                <option value="">Todos</option>
+                <option value="{{ Status.PENDENTE }}" {% if status == Status.PENDENTE %}selected{% endif %}>Pendente</option>
+                <option value="{{ Status.PARCIAL }}" {% if status == Status.PARCIAL %}selected{% endif %}>Parcial</option>
+                <option value="{{ Status.PAGO }}" {% if status == Status.PAGO %}selected{% endif %}>Pago</option>
+                <option value="{{ Status.CANCELADO }}" {% if status == Status.CANCELADO %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+
+        <div>
+            <button class="btn" type="submit">Filtrar</button>
+            <a class="btn" href="{% url 'financeiro_contas' %}">Limpar</a>
+        </div>
+    </form>
+</div>
+
+<div class="table-wrap" style="margin-top: 12px;">
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Locação</th>
+            <th>Valor</th>
+            <th>Vencimento</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in contas %}
+        <tr>
+            <td>{{ c.cliente.nome }}</td>
+            <td>#{{ c.locacao.id }} - {{ c.locacao.ferramenta.nome }}</td>
+            <td>R$ {{ c.valor|floatformat:2 }}</td>
+            <td>{{ c.vencimento|date:"d/m/Y" }}</td>
+            <td>{{ c.get_status_display }}</td>
+            <td style="display:flex; gap:8px;">
+                <a class="btn" href="{% url 'financeiro_conta_detalhe' c.id %}">Abrir</a>
+                <a class="btn" href="{% url 'financeiro_registrar_pagamento' c.id %}">Receber</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Nenhuma conta encontrada.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

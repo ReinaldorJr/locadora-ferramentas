@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Locadora{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ferramentas/style.css' %}">
+</head>
+<body>
+
+<h1>Sistema em Desenvolvimento</h1>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="top-actions">
+    <!-- Sempre -->
+    <a class="btn" href="{% url 'home' %}">Início</a>
+
+    {% if is_admin %}
+        <a class="btn" href="{% url 'listar_clientes' %}">Clientes</a>
+        <a class="btn" href="{% url 'listar_ferramentas' %}">Ferramentas</a>
+        <a class="btn" href="{% url 'relatorio_atrasos' %}">
+            Atrasos{% if total_atrasadas %} ({{ total_atrasadas }}){% endif %}
+        </a>
+    {% endif %}
+
+    <a class="btn" href="{% url 'financeiro_contas' %}">
+        Financeiro{% if contas_em_aberto %} ({{ contas_em_aberto }}){% endif %}
+    </a>
+
+    <a class="btn" href="{% url 'listar_locacoes' %}">Locações</a>
+
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button class="btn danger" type="submit">Sair</button>
+    </form>
+</div>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

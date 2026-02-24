@@ -1,0 +1,43 @@
+{% extends "ferramentas/base.html" %}
+{% block title %}Financeiro - Registrar Pagamento{% endblock %}
+
+{% block content %}
+
+<h2>Registrar Pagamento</h2>
+
+<div class="table-wrap" style="padding: 16px;">
+    <p><b>Cliente:</b> {{ conta.cliente.nome }}</p>
+    <p><b>Locação:</b> #{{ conta.locacao.id }} - {{ conta.locacao.ferramenta.nome }}</p>
+    <p><b>Valor da conta:</b> R$ {{ conta.valor|floatformat:2 }}</p>
+    <p><b>Saldo atual:</b> R$ {{ saldo|floatformat:2 }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div style="margin-bottom:10px;">
+            <label>Valor do pagamento (R$)</label><br>
+            <input type="number" step="0.01" name="valor" required style="width: 100%; padding:8px;"
+                   placeholder="Ex: 100.00">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <label>Forma de pagamento</label><br>
+            <select name="forma" required style="width:100%; padding:8px;">
+                {% for key, label in Formas.choices %}
+                    <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <label>Observação</label><br>
+            <input type="text" name="observacao" style="width: 100%; padding:8px;"
+                   placeholder="Opcional">
+        </div>
+
+        <button class="btn" type="submit">Salvar</button>
+        <a class="btn" href="{% url 'financeiro_conta_detalhe' conta.id %}">Cancelar</a>
+    </form>
+</div>
+
+{% endblock %}

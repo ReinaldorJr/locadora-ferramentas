@@ -1,0 +1,65 @@
+{% extends "ferramentas/base.html" %}
+{% block title %}Financeiro - Detalhe da Conta{% endblock %}
+
+{% block content %}
+
+<h2>Detalhe da Conta a Receber</h2>
+
+<div class="top-actions" style="margin-bottom: 12px;">
+    <a class="btn" href="{% url 'financeiro_contas' %}">Voltar</a>
+    <a class="btn" href="{% url 'financeiro_registrar_pagamento' conta.id %}">Receber</a>
+</div>
+
+<div class="cards" style="grid-template-columns: repeat(4, minmax(160px, 1fr));">
+    <div class="card">
+        <div class="card-title">Cliente</div>
+        <div class="card-value" style="font-size:16px;">{{ conta.cliente.nome }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Valor</div>
+        <div class="card-value">R$ {{ conta.valor|floatformat:2 }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Total pago</div>
+        <div class="card-value">R$ {{ total_pago|floatformat:2 }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Saldo</div>
+        <div class="card-value">R$ {{ saldo|floatformat:2 }}</div>
+    </div>
+</div>
+
+<div class="table-wrap" style="padding: 12px; margin-top: 12px;">
+    <b>Status:</b> {{ conta.get_status_display }} <br>
+    <b>Vencimento:</b> {{ conta.vencimento|date:"d/m/Y" }} <br>
+    <b>Locação:</b> #{{ conta.locacao.id }} - {{ conta.locacao.ferramenta.nome }}
+</div>
+
+<h3 style="margin-top: 14px;">Pagamentos</h3>
+
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Forma</th>
+            <th>Valor</th>
+            <th>Observação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in pagamentos %}
+        <tr>
+            <td>{{ p.data_pagamento|date:"d/m/Y H:i" }}</td>
+            <td>{{ p.get_forma_display }}</td>
+            <td>R$ {{ p.valor|floatformat:2 }}</td>
+            <td>{{ p.observacao }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhum pagamento registrado.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

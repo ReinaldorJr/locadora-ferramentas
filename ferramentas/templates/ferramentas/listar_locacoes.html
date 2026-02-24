@@ -1,0 +1,129 @@
+{% extends "ferramentas/base.html" %}
+
+{% block title %}Locações{% endblock %}
+
+{% block content %}
+
+<h2>Locações</h2>
+
+<div class="table-wrap" style="padding: 12px; margin-bottom: 12px;">
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:2; min-width:240px;">
+            <label>Buscar</label><br>
+            <input type="text" name="q" value="{{ q }}" style="width:100%; padding:8px;"
+                   placeholder="Cliente, CPF/CNPJ ou ferramenta">
+        </div>
+
+        <div style="min-width:180px;">
+            <label>Status</label><br>
+            <select name="status" style="width:100%; padding:8px;">
+                <option value="" {% if not status %}selected{% endif %}>Todas</option>
+                <option value="ATIVAS" {% if status == "ATIVAS" %}selected{% endif %}>Ativas</option>
+                <option value="DEVOLVIDAS" {% if status == "DEVOLVIDAS" %}selected{% endif %}>Devolvidas</option>
+            </select>
+        </div>
+
+        <div style="min-width:180px;">
+            <label>Financeiro</label><br>
+            <select name="financeiro" style="width:100%; padding:8px;">
+                <option value="" {% if not financeiro %}selected{% endif %}>Todos</option>
+                <option value="{{ StatusConta.PENDENTE }}" {% if financeiro == StatusConta.PENDENTE %}selected{% endif %}>Pendente</option>
+                <option value="{{ StatusConta.PARCIAL }}" {% if financeiro == StatusConta.PARCIAL %}selected{% endif %}>Parcial</option>
+                <option value="{{ StatusConta.PAGO }}" {% if financeiro == StatusConta.PAGO %}selected{% endif %}>Pago</option>
+                <option value="{{ StatusConta.CANCELADO }}" {% if financeiro == StatusConta.CANCELADO %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+
+        <div>
+            <button class="btn" type="submit">Filtrar</button>
+            <a class="btn" href="{% url 'listar_locacoes' %}">Limpar</a>
+            <a class="btn" href="{% url 'nova_locacao' %}">Nova Locação</a>
+        </div>
+    </form>
+</div>
+
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Ferramenta</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Financeiro</th>
+            <th>Saldo</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for item in linhas %}
+        {% with locacao=item.locacao conta=item.conta %}
+        <tr>
+            <td>{{ locacao.cliente.nome }}</td>
+            <td>{{ locacao.ferramenta.nome }}</td>
+            <td>{{ locacao.data_inicio|date:"d/m/Y" }}</td>
+            <td>{{ locacao.data_fim|date:"d/m/Y" }}</td>
+            <td>R$ {{ locacao.valor_total|floatformat:2 }}</td>
+
+            <td>
+                {% if locacao.devolvida %}
+                    <span class="status status-ok">Devolvida</span>
+                {% else %}
+                    <span class="status status-warn">Ativa</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if conta %}
+                    {% if conta.status == StatusConta.PAGO %}
+                        <span class="status status-paid">Pago</span>
+                    {% elif conta.status == StatusConta.PARCIAL %}
+                        <span class="status status-partial">Parcial</span>
+                    {% elif conta.status == StatusConta.PENDENTE %}
+                        <span class="status status-pending">Pendente</span>
+                    {% elif conta.status == StatusConta.CANCELADO %}
+                        <span class="status status-cancel">Cancelado</span>
+                    {% else %}
+                        <span class="status status-pending">{{ conta.get_status_display }}</span>
+                    {% endif %}
+                {% else %}
+                    <span class="status status-pending">—</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {% if conta %}
+                    R$ {{ item.saldo|floatformat:2 }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <td style="display:flex; gap:8px; align-items:center;">
+                {% if conta %}
+                    <a class="btn" href="{% url 'financeiro_conta_detalhe' conta.id %}">Abrir Conta</a>
+                    <a class="btn" href="{% url 'financeiro_registrar_pagamento' conta.id %}">Receber</a>
+                {% else %}
+                    —
+                {% endif %}
+
+                {% if not locacao.devolvida %}
+                    <form method="post" action="{% url 'devolver_locacao' locacao.id %}">
+                        {% csrf_token %}
+                        <button class="btn danger" type="submit">Devolver</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endwith %}
+    {% empty %}
+        <tr><td colspan="9">Nenhuma locação cadastrada.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}
