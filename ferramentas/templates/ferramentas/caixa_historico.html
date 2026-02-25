@@ -1,0 +1,65 @@
+{% extends "ferramentas/base.html" %}
+
+{% block title %}Histórico do Caixa{% endblock %}
+
+{% block content %}
+
+<div class="table-wrap" style="padding:16px;">
+  <h2 style="margin:0 0 10px 0;">Histórico do Caixa</h2>
+
+  <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+    <div>
+      <div style="font-size:12px; opacity:0.8;">De</div>
+      <input type="date" name="de" value="{{ de }}" class="input">
+    </div>
+    <div>
+      <div style="font-size:12px; opacity:0.8;">Até</div>
+      <input type="date" name="ate" value="{{ ate }}" class="input">
+    </div>
+    <div style="align-self:end;">
+      <button class="btn" type="submit">Filtrar</button>
+      <a class="btn" href="{% url 'caixa_historico' %}">Limpar</a>
+    </div>
+  </form>
+
+  <div style="overflow:auto;">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Status</th>
+          <th style="text-align:right;">Saldo inicial</th>
+          <th style="text-align:right;">Saldo final</th>
+          <th style="text-align:right;">Entradas</th>
+          <th style="text-align:right;">Saídas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in itens %}
+          <tr>
+            <td>{{ item.caixa.data|date:"d/m/Y" }}</td>
+            <td>{{ item.caixa.status }}</td>
+            <td style="text-align:right;">R$ {{ item.caixa.saldo_inicial|floatformat:2 }}</td>
+            <td style="text-align:right;">
+              {% if item.caixa.saldo_final is not None %}
+                R$ {{ item.caixa.saldo_final|floatformat:2 }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td style="text-align:right;">R$ {{ item.entradas|floatformat:2 }}</td>
+            <td style="text-align:right;">R$ {{ item.saidas|floatformat:2 }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6">Nenhum caixa encontrado no período.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:12px;">
+    <a class="btn" href="{% url 'caixa_dia' %}">Voltar</a>
+  </div>
+</div>
+
+{% endblock %}

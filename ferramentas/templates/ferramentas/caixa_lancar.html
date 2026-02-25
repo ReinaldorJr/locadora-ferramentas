@@ -1,0 +1,43 @@
+{% extends "ferramentas/base.html" %}
+
+{% block title %}Lançar Movimento{% endblock %}
+
+{% block content %}
+
+<div class="table-wrap" style="padding:16px; max-width:520px;">
+  <h2 style="margin:0 0 10px 0;">Lançar {{ tipo }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label style="display:block; margin-bottom:6px;">Categoria</label>
+    <select name="categoria" class="input" required>
+      {% for v, label in Categorias %}
+        <option value="{{ v }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <label style="display:block; margin:10px 0 6px 0;">Forma</label>
+    <select name="forma" class="input" required>
+      {% for v, label in Formas %}
+        <option value="{{ v }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <label style="display:block; margin:10px 0 6px 0;">Valor</label>
+    <input type="number" step="0.01" name="valor" class="input" required>
+
+    <label style="display:block; margin:10px 0 6px 0;">Descrição</label>
+    <input type="text" name="descricao" class="input">
+
+    <label style="display:block; margin:10px 0 6px 0;">Referência (opcional)</label>
+    <input type="text" name="referencia" class="input">
+
+    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn" type="submit">Salvar</button>
+      <a class="btn" href="{% url 'caixa_dia' %}">Voltar</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

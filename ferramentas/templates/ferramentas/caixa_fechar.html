@@ -1,0 +1,33 @@
+{% extends "ferramentas/base.html" %}
+
+{% block title %}Fechar Caixa{% endblock %}
+
+{% block content %}
+
+<div class="table-wrap" style="padding:16px; max-width:560px;">
+  <h2 style="margin:0 0 10px 0;">Fechar Caixa — {{ caixa.data|date:"d/m/Y" }}</h2>
+
+  <div style="display:grid; gap:6px; margin-bottom:12px;">
+    <div>Saldo inicial: <b>R$ {{ caixa.saldo_inicial|floatformat:2 }}</b></div>
+    <div>Entradas: <b>R$ {{ total_entradas|floatformat:2 }}</b></div>
+    <div>Saídas: <b>R$ {{ total_saidas|floatformat:2 }}</b></div>
+    <div>Saldo calculado: <b>R$ {{ saldo_calculado|floatformat:2 }}</b></div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label style="display:block; margin-bottom:6px;">Saldo conferido (o que você contou)</label>
+    <input type="number" step="0.01" name="saldo_conferido" class="input" required>
+
+    <label style="display:block; margin:10px 0 6px 0;">Observação (opcional)</label>
+    <input type="text" name="observacao" class="input">
+
+    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn" type="submit">Fechar Caixa</button>
+      <a class="btn" href="{% url 'caixa_dia' %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

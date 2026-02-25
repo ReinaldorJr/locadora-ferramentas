@@ -1,0 +1,179 @@
+{% extends "ferramentas/base.html" %}
+
+{% block title %}Caixa do Dia{% endblock %}
+
+{% block content %}
+
+<div class="table-wrap" style="padding:16px;">
+  <h2 style="margin:0 0 10px 0;">Caixa do Dia — {{ hoje|date:"d/m/Y" }}</h2>
+
+  {# ------------------------------------------------------------
+     BOTÃO RESETAR (SOMENTE ADMIN)
+     - Só aparece se existir caixa no dia
+     - Só funciona se estiver FECHADO
+     ------------------------------------------------------------ #}
+  {% if is_admin and caixa %}
+    <div style="margin: 0 0 12px 0; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      {% if caixa.status == "FECHADO" %}
+        <form method="post" action="{% url 'caixa_resetar_hoje' %}"
+              onsubmit="return confirm('ATENÇÃO! Isso vai APAGAR o caixa de hoje e TODOS os movimentos. Tem certeza?');"
+              style="margin:0;">
+          {% csrf_token %}
+          <button class="btn danger" type="submit">Resetar Caixa (Admin)</button>
+        </form>
+        <span style="font-size:12px; opacity:0.8;">
+          (Somente Admin) Apaga o caixa FECHADO de hoje para você abrir novamente.
+        </span>
+      {% else %}
+        <button class="btn danger" type="button" disabled title="Feche o caixa para poder resetar">
+          Resetar Caixa (Admin)
+        </button>
+        <span style="font-size:12px; opacity:0.8;">
+          Para resetar, o caixa precisa estar <b>FECHADO</b>.
+        </span>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if caixa and caixa.status == "ABERTO" %}
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+      <div class="card" style="min-width:220px;">
+        <div class="card-title">Saldo inicial</div>
+        <div class="card-value">R$ {{ caixa.saldo_inicial|floatformat:2 }}</div>
+      </div>
+      <div class="card" style="min-width:220px;">
+        <div class="card-title">Entradas</div>
+        <div class="card-value">R$ {{ total_entradas|floatformat:2 }}</div>
+      </div>
+      <div class="card" style="min-width:220px;">
+        <div class="card-title">Saídas</div>
+        <div class="card-value">R$ {{ total_saidas|floatformat:2 }}</div>
+      </div>
+      <div class="card" style="min-width:220px;">
+        <div class="card-title">Saldo atual</div>
+        <div class="card-value">R$ {{ saldo_atual|floatformat:2 }}</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+      <a class="btn" href="{% url 'caixa_lancar' %}?tipo=ENTRADA">Nova Entrada</a>
+      <a class="btn" href="{% url 'caixa_lancar' %}?tipo=SAIDA">Nova Saída</a>
+      <a class="btn" href="{% url 'caixa_fechar' %}">Fechar Caixa</a>
+      <a class="btn" href="{% url 'caixa_historico' %}">Histórico</a>
+    </div>
+
+    <h3 style="margin:0 0 8px 0;">Movimentos de hoje</h3>
+    <div style="overflow:auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Tipo</th>
+            <th>Categoria</th>
+            <th>Forma</th>
+            <th>Descrição</th>
+            <th style="text-align:right;">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in movimentos %}
+            <tr>
+              <td>{{ m.criado_em|date:"H:i" }}</td>
+              <td>{{ m.tipo }}</td>
+              <td>{{ m.categoria }}</td>
+              <td>{{ m.forma }}</td>
+              <td>{{ m.descricao }}</td>
+              <td style="text-align:right;">R$ {{ m.valor|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6">Nenhum movimento lançado hoje.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    {# Aqui entra tanto: "sem caixa" quanto "caixa FECHADO" #}
+
+    {% if caixa and caixa.status == "FECHADO" %}
+      <p style="margin:10px 0;">
+        O caixa de hoje está <b>FECHADO</b>.
+      </p>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <div class="card" style="min-width:220px;">
+          <div class="card-title">Saldo inicial</div>
+          <div class="card-value">R$ {{ caixa.saldo_inicial|floatformat:2 }}</div>
+        </div>
+        <div class="card" style="min-width:220px;">
+          <div class="card-title">Entradas</div>
+          <div class="card-value">R$ {{ total_entradas|floatformat:2 }}</div>
+        </div>
+        <div class="card" style="min-width:220px;">
+          <div class="card-title">Saídas</div>
+          <div class="card-value">R$ {{ total_saidas|floatformat:2 }}</div>
+        </div>
+        <div class="card" style="min-width:220px;">
+          <div class="card-title">Saldo final</div>
+          <div class="card-value">R$ {{ saldo_atual|floatformat:2 }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+        <a class="btn" href="{% url 'caixa_historico' %}">Histórico</a>
+      </div>
+
+      <h3 style="margin:0 0 8px 0;">Movimentos de hoje</h3>
+      <div style="overflow:auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Tipo</th>
+              <th>Categoria</th>
+              <th>Forma</th>
+              <th>Descrição</th>
+              <th style="text-align:right;">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in movimentos %}
+              <tr>
+                <td>{{ m.criado_em|date:"H:i" }}</td>
+                <td>{{ m.tipo }}</td>
+                <td>{{ m.categoria }}</td>
+                <td>{{ m.forma }}</td>
+                <td>{{ m.descricao }}</td>
+                <td style="text-align:right;">R$ {{ m.valor|floatformat:2 }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6">Nenhum movimento lançado hoje.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% else %}
+      <p style="margin:10px 0;">Não há caixa aberto hoje.</p>
+
+      <div style="max-width:420px;">
+        <form method="post" action="{% url 'caixa_abrir' %}">
+          {% csrf_token %}
+
+          <label style="display:block; margin-bottom:6px;">Saldo inicial</label>
+          <input type="number" step="0.01" name="saldo_inicial" class="input" required>
+
+          <label style="display:block; margin:10px 0 6px 0;">Observação (opcional)</label>
+          <input type="text" name="observacao" class="input">
+
+          <div style="margin-top:12px;">
+            <button class="btn" type="submit">Abrir Caixa</button>
+            <a class="btn" href="{% url 'caixa_historico' %}">Ver Histórico</a>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% endblock %}

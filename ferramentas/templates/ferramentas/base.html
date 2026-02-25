@@ -30,9 +30,9 @@
         </a>
     {% endif %}
 
-    <a class="btn" href="{% url 'financeiro_contas' %}">
-        Financeiro{% if contas_em_aberto %} ({{ contas_em_aberto }}){% endif %}
-    </a>
+    <a class="btn" href="{% url 'financeiro_home' %}">
+    Financeiro ({{ contas_em_aberto }})
+</a>
 
     <a class="btn" href="{% url 'listar_locacoes' %}">Locações</a>
 

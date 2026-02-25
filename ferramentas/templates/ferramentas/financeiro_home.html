@@ -1,0 +1,43 @@
+{% extends "ferramentas/base.html" %}
+
+{% block title %}Financeiro{% endblock %}
+
+{% block content %}
+
+<h2 style="margin-top:0;">Financeiro</h2>
+
+<div class="cards" style="margin-bottom:12px;">
+  <div class="card">
+    <div class="card-title">Contas pendentes</div>
+    <div class="card-value">{{ pendentes }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Contas parciais</div>
+    <div class="card-value">{{ parciais }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Total em aberto</div>
+    <div class="card-value">R$ {{ total_aberto|floatformat:2 }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Caixa (hoje)</div>
+    <div class="card-value">
+      {% if caixa_status %}
+        {{ caixa_status }} — R$ {{ saldo_atual|floatformat:2 }}
+      {% else %}
+        Não iniciado
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="table-wrap" style="padding:16px;">
+  <h3 style="margin:0 0 10px 0;">Opções</h3>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a class="btn" href="{% url 'financeiro_contas' %}">Contas a Receber</a>
+    <a class="btn" href="{% url 'caixa_dia' %}">Caixa do Dia</a>
+  </div>
+</div>
+
+{% endblock %}
